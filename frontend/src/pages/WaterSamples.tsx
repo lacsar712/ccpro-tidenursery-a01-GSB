@@ -178,10 +178,10 @@ export default function WaterSamples() {
                 <td>{r.id}</td>
                 <td>{pondLabel(r.pondId)}</td>
                 <td>{new Date(r.sampledAt).toLocaleString()}</td>
-                <td>{r.tempC}</td>
+                <td>{r.tempC ?? '—'}</td>
                 <td>{r.salinityPpt}</td>
-                <td>{r.doMgL}</td>
-                <td>{r.ph}</td>
+                <td>{r.doMgL ?? '—'}</td>
+                <td>{r.ph ?? '—'}</td>
                 <td>{r.notes || '—'}</td>
                 <td>
                   <button className="btn ghost" onClick={() => remove(r.id)}>

@@ -34,3 +34,5 @@ class PondOut(BaseModel):
     species: str
     volume_m3: float = Field(serialization_alias="volumeM3")
     status: PondStatus
+    # 是否有进行中（结束时刻为空）的换水冲程
+    water_changing: bool = Field(False, serialization_alias="waterChanging")

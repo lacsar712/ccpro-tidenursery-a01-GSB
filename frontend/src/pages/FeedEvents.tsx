@@ -88,11 +88,17 @@ export default function FeedEvents() {
             required
           >
             {ponds.map((p) => (
-              <option key={p.id} value={p.id}>
+              <option key={p.id} value={p.id} disabled={p.waterChanging}>
                 {p.pondCode} · {p.species}
+                {p.waterChanging ? ' · 换水中禁喂' : ''}
               </option>
             ))}
           </select>
+          {ponds.find((p) => p.id === form.pondId)?.waterChanging && (
+            <div className="field-hint error-text">
+              该塘口换水冲程进行中，禁止新建投喂；冲程结束后恢复。
+            </div>
+          )}
         </label>
         <label>
           投喂时间

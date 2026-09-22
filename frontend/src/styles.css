@@ -278,6 +278,31 @@ th {
   color: #1a7a6c;
 }
 
+.badge.changing {
+  background: #e6f0ff;
+  color: #1c5dc4;
+}
+
+.finish-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.finish-cell input {
+  width: auto;
+}
+
+.field-hint {
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+.error-text {
+  color: var(--warn, #c2682a);
+}
+
 .login-page {
   min-height: 100vh;
   display: grid;

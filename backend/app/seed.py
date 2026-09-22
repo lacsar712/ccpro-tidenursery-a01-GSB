@@ -6,6 +6,7 @@ from app.models.feed_event import FeedEvent
 from app.models.hatchery import Hatchery
 from app.models.pond import Pond
 from app.models.user import User
+from app.models.water_change_stroke import WaterChangeStroke
 from app.models.water_sample import WaterSample
 
 
@@ -126,6 +127,16 @@ def seed() -> None:
                         feed_type="微藻饲料",
                         amount_kg=2.5,
                         operator_name="水质技术员",
+                    ),
+                    # 一条进行中冲程（结束时刻为空）：A-01 当前正在换水，禁止新建投喂
+                    WaterChangeStroke(
+                        pond_id=p1.id,
+                        outflow_m3=20.0,
+                        inflow_m3=21.0,
+                        start_at=now - timedelta(minutes=20),
+                        end_at=None,
+                        operator_name="场长",
+                        note=None,
                     ),
                 ]
             )

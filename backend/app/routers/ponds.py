@@ -10,8 +10,19 @@ from app.models.hatchery import Hatchery
 from app.models.pond import Pond
 from app.models.user import User
 from app.schemas.pond import PondCreate, PondUpdate, PondOut
+from app.services.water_change import changing_pond_ids
 
 router = APIRouter(prefix="/api/ponds", tags=["ponds"])
+
+
+def _attach_water_changing(db: Session, ponds: List[Pond]) -> List[PondOut]:
+    changing = changing_pond_ids(db, [p.id for p in ponds])
+    result: List[PondOut] = []
+    for p in ponds:
+        out = PondOut.model_validate(p)
+        out.water_changing = p.id in changing
+        result.append(out)
+    return result
 
 
 @router.get("", response_model=List[PondOut])
@@ -23,7 +34,8 @@ def list_ponds(
     q = db.query(Pond)
     if hatchery_id is not None:
         q = q.filter(Pond.hatchery_id == hatchery_id)
-    return q.order_by(Pond.id).all()
+    ponds = q.order_by(Pond.id).all()
+    return _attach_water_changing(db, ponds)
 
 
 @router.post("", response_model=PondOut, status_code=status.HTTP_201_CREATED)
@@ -49,7 +61,7 @@ def create_pond(
         db.rollback()
         raise HTTPException(status_code=400, detail="同场塘口号已存在")
     db.refresh(item)
-    return item
+    return _attach_water_changing(db, [item])[0]
 
 
 @router.get("/{pond_id}", response_model=PondOut)
@@ -61,7 +73,7 @@ def get_pond(
     item = db.query(Pond).filter(Pond.id == pond_id).first()
     if not item:
         raise HTTPException(status_code=404, detail="塘口不存在")
-    return item
+    return _attach_water_changing(db, [item])[0]
 
 
 @router.put("/{pond_id}", response_model=PondOut)
@@ -87,7 +99,7 @@ def update_pond(
         db.rollback()
         raise HTTPException(status_code=400, detail="同场塘口号已存在")
     db.refresh(item)
-    return item
+    return _attach_water_changing(db, [item])[0]
 
 
 @router.delete("/{pond_id}", status_code=status.HTTP_204_NO_CONTENT)

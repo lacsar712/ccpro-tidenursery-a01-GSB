@@ -19,16 +19,17 @@ export type Pond = {
   species: string
   volumeM3: number
   status: 'stocked' | 'dry' | 'quarantine'
+  waterChanging?: boolean
 }
 
 export type WaterSample = {
   id: number
   pondId: number
   sampledAt: string
-  tempC: number
+  tempC: number | null
   salinityPpt: number
-  doMgL: number
-  ph: number
+  doMgL: number | null
+  ph: number | null
   notes?: string | null
 }
 
@@ -39,6 +40,18 @@ export type FeedEvent = {
   feedType: string
   amountKg: number
   operatorName: string
+}
+
+export type WaterChangeStroke = {
+  id: number
+  pondId: number
+  outflowM3: number
+  inflowM3: number
+  startAt: string
+  endAt: string | null
+  operatorName: string
+  note?: string | null
+  closingSampleId?: number | null
 }
 
 export type DashboardStats = {
