@@ -36,8 +36,8 @@ class WaterSampleOut(BaseModel):
     id: int
     pond_id: int = Field(serialization_alias="pondId")
     sampled_at: datetime = Field(serialization_alias="sampledAt")
-    temp_c: float = Field(serialization_alias="tempC")
+    temp_c: Optional[float] = Field(None, serialization_alias="tempC")
     salinity_ppt: float = Field(serialization_alias="salinityPpt")
-    do_mg_l: float = Field(serialization_alias="doMgL")
-    ph: float
+    do_mg_l: Optional[float] = Field(None, serialization_alias="doMgL")
+    ph: Optional[float] = None
     notes: Optional[str] = None

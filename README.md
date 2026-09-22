@@ -46,11 +46,24 @@ docker compose up --build
 3. **Pond 育苗塘**：`hatcheryId`、`pondCode`、`species`、`volumeM3`、`status(stocked|dry|quarantine)`；同场 `pondCode` 唯一
 4. **WaterSample 水质样**：`pondId`、`sampledAt`、`tempC`、`salinityPpt`、`doMgL`、`ph`、`notes`；`doMgL > 0` 且 `ph ∈ [6,9]`，否则返回 **400**
 5. **FeedEvent 投喂**：`pondId`、`fedAt`、`feedType`、`amountKg`、`operatorName`
-6. **Dashboard**：塘总数、quarantine 数、近 24h 采样数、近 7 日投喂总量 kg
+6. **WaterChangeStroke 换水冲程**：见下节
+7. **Dashboard**：塘总数、quarantine 数、近 24h 采样数、近 7 日投喂总量 kg
+
+## 换水冲程（换水台账）
+
+字段：`pondId`（所属塘口）、`outVolumeM3`（换出立方数，必须 > 0）、`inVolumeM3`（换入立方数，必须 > 0）、`startedAt`（开始时刻）、`endedAt`（结束时刻，进行中为空）、`operatorName`（操作人）、`notes`（备注）。
+
+规则：
+
+- **挂塘口、与投喂互斥**：冲程结束时刻为空 = 进行中，此时该塘**禁止新建投喂**（`POST /api/feed-events` 返回 **409** 并回显进行中冲程编号）；结束后恢复。互斥判定与冲程状态共用 `app/services/water_change.py` 的同一组函数（`get_active_stroke` / `is_pond_water_changing` / `assert_feed_allowed`），不是只登记不拦截。
+- **开始时刻半小时互斥**：同一塘口在新冲程 `startedAt` 前后 30 分钟内只允许一条冲程，冲突返回 **409** 并回显已有冲程编号（`POST /api/water-changes`）。
+- **干塘 / 隔离塘**：`dry` 干塘禁止开冲程（**409**）；`quarantine` 隔离塘允许开，但 `notes` 必填，否则 **400**。
+- **结束冲程**：`POST /api/water-changes/{id}/finish`，`endedAt` 必须晚于 `startedAt`（否则 **400**）。结束时**同一事务**追加一条 `WaterSample`：`sampledAt = endedAt`、盐度取换入水约定默认值 **30 ppt**（`INCOMING_WATER_SALINITY_PPT`，见后端配置），水温 / 溶解氧 / pH 留空待测；只更新冲程不写水质样不算完成（同一 commit，失败整体回滚）。
+- 塘口列表与详情每个塘口返回 `waterChanging`（是否正在换水）；种子数据含一条进行中冲程（A-01）。
 
 ## 前端页面
 
-Login · Dashboard · Hatcheries · Ponds · WaterSamples · FeedEvents
+Login · Dashboard · Hatcheries · Ponds · WaterSamples · FeedEvents · WaterChanges（侧栏「换水冲程」；塘口列表每行显示是否正在换水）
 
 ## 本地开发（可选）
 

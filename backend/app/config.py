@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     jwt_secret: str = "tide-nursery-jwt-secret-change-me"
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 480
+    # 换入水约定默认盐度（ppt）：结束换水冲程自动追加水质样时使用
+    incoming_water_salinity_ppt: float = 30.0
 
 
 settings = Settings()

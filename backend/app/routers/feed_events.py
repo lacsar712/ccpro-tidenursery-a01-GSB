@@ -9,6 +9,7 @@ from app.models.feed_event import FeedEvent
 from app.models.pond import Pond
 from app.models.user import User
 from app.schemas.feed_event import FeedEventCreate, FeedEventOut
+from app.services.water_change import assert_feed_allowed
 
 router = APIRouter(prefix="/api/feed-events", tags=["feed-events"])
 
@@ -34,6 +35,8 @@ def create_event(
     pond = db.query(Pond).filter(Pond.id == payload.pond_id).first()
     if not pond:
         raise HTTPException(status_code=400, detail="塘口不存在")
+    # 互斥判定与冲程状态共用函数：换水中（冲程未结束）禁止新建投喂
+    assert_feed_allowed(db, payload.pond_id)
     item = FeedEvent(
         pond_id=payload.pond_id,
         fed_at=payload.fed_at,

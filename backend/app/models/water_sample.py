@@ -13,10 +13,11 @@ class WaterSample(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     pond_id: Mapped[int] = mapped_column(ForeignKey("ponds.id"), nullable=False, index=True)
     sampled_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
-    temp_c: Mapped[float] = mapped_column(Float, nullable=False)
+    # 换水冲程结束自动采样时仅记录盐度，其余指标待实验室补测，故允许为空
+    temp_c: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     salinity_ppt: Mapped[float] = mapped_column(Float, nullable=False)
-    do_mg_l: Mapped[float] = mapped_column(Float, nullable=False)
-    ph: Mapped[float] = mapped_column(Float, nullable=False)
+    do_mg_l: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    ph: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     pond: Mapped["Pond"] = relationship("Pond", back_populates="water_samples")

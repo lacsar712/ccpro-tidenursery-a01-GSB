@@ -71,6 +71,9 @@ export default function FeedEvents() {
     return p ? `${p.pondCode} (${p.species})` : `#${id}`
   }
 
+  const selectedPond = ponds.find((p) => p.id === form.pondId) || null
+  const blocked = !!selectedPond?.waterChanging
+
   return (
     <div>
       <header className="page-header">
@@ -90,6 +93,7 @@ export default function FeedEvents() {
             {ponds.map((p) => (
               <option key={p.id} value={p.id}>
                 {p.pondCode} · {p.species}
+                {p.waterChanging ? '（换水中）' : ''}
               </option>
             ))}
           </select>
@@ -130,9 +134,20 @@ export default function FeedEvents() {
             required
           />
         </label>
-        <button type="submit" className="btn primary">
+        <button
+          type="submit"
+          className="btn primary"
+          disabled={blocked}
+          title={blocked ? '该塘换水冲程进行中，结束后才能投喂' : undefined}
+        >
           登记投喂
         </button>
+        {blocked && (
+          <div className="error span-2">
+            该塘正在换水（进行中冲程未结束），禁止新建投喂；换水结束后自动恢复。（服务端同样会返回
+            409）
+          </div>
+        )}
       </form>
 
       <div className="table-wrap">

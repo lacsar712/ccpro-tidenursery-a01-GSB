@@ -130,6 +130,30 @@ a {
   margin: 12px 0;
 }
 
+.info {
+  background: #e3f7f4;
+  color: #1a7a6c;
+  border: 1px solid #b6e7e0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 12px 0;
+}
+
+.badge.changing {
+  background: #e3efff;
+  color: #1c5fbf;
+}
+
+.finish-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.finish-cell input {
+  width: 190px;
+}
+
 .panel,
 .table-wrap,
 .stat-card {

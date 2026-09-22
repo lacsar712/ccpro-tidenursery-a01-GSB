@@ -17,10 +17,16 @@ class Pond(Base):
     volume_m3: Mapped[float] = mapped_column(Float, nullable=False)
     status: Mapped[str] = mapped_column(String(32), nullable=False, default="stocked")
 
+    # 非持久化：由塘口接口按"是否存在进行中换水冲程"回填
+    water_changing: bool = False
+
     hatchery: Mapped["Hatchery"] = relationship("Hatchery", back_populates="ponds")
     water_samples: Mapped[List["WaterSample"]] = relationship(
         "WaterSample", back_populates="pond", cascade="all, delete-orphan"
     )
     feed_events: Mapped[List["FeedEvent"]] = relationship(
         "FeedEvent", back_populates="pond", cascade="all, delete-orphan"
+    )
+    water_change_strokes: Mapped[List["WaterChangeStroke"]] = relationship(
+        "WaterChangeStroke", back_populates="pond", cascade="all, delete-orphan"
     )
